@@ -448,14 +448,6 @@
             document.getElementById('loadingScreen').classList.add('hidden');
         }
 
-        window.toggleService = toggleService;
-        window.changeQuantity = changeQuantity;
-        window.submitQuote = submitQuote;
-        window.calculateTotal = calculateTotal;
-        window.updateQuoteSummary = updateQuoteSummary;
-    </script>
-
-    <script>
         function toggleService(serviceId) {
             const service = services.find(s => s.id === serviceId);
             if (!service || service.priceType === 'perUnit') return;
@@ -601,6 +593,12 @@
                 document.getElementById('submitBtn').textContent = 'Request Quote';
             }
         }
+
+        window.toggleService = toggleService;
+        window.changeQuantity = changeQuantity;
+        window.submitQuote = submitQuote;
+        window.calculateTotal = calculateTotal;
+        window.updateQuoteSummary = updateQuoteSummary;
     </script>
 </body>
 </html>
