@@ -438,15 +438,17 @@
             }
         }
 
-        // Get business ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        window.businessId = urlParams.get('id');
+        // Get business ID from URL and initialize
+        (async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            window.businessId = urlParams.get('id');
 
-        if (!window.businessId) {
-            showError('Invalid calculator link. Please check your URL.');
-        } else {
-            await loadCalculator();
-        }
+            if (!window.businessId) {
+                showError('Invalid calculator link. Please check your URL.');
+            } else {
+                await loadCalculator();
+            }
+        })();
 
         function toggleService(serviceId) {
             const service = services.find(s => s.id === serviceId);
