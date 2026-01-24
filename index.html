@@ -517,12 +517,16 @@
                 
                 window.services = [];
                 snapshot.forEach((doc) => {
-                    window.services.push({ id: doc.id, ...doc.data() });
+                    const serviceData = { id: doc.id, ...doc.data() };
+                    // Only include active services (default to true if not set)
+                    if (serviceData.active !== false) {
+                        window.services.push(serviceData);
+                    }
                 });
                 console.log('Services loaded:', window.services);
 
                 if (window.services.length === 0) {
-                    console.warn('No services available');
+                    console.warn('No active services available');
                     showError('No services available at this time.');
                     return;
                 }
