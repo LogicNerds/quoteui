@@ -437,7 +437,7 @@
             const landingContact = document.getElementById('landingContact');
             const landingSection = document.getElementById('landingSection');
 
-            if (data.landingHeadline || data.landingMessage || data.landingPhone) {
+            if (data.landingHeadline || data.landingMessage || data.businessPhone) {
                 landingHeadline.textContent = data.landingHeadline || 'Get Your Custom Quote';
                 landingMessage.textContent = data.landingMessage || '';
                 
@@ -446,8 +446,8 @@
                 if (data.contactEmail) {
                     contactHTML += `<div class="landing-contact-item">📧 ${data.contactEmail}</div>`;
                 }
-                if (data.landingPhone) {
-                    contactHTML += `<div class="landing-contact-item">📞 ${data.landingPhone}</div>`;
+                if (data.businessPhone) {
+                    contactHTML += `<div class="landing-contact-item">📞 ${data.businessPhone}</div>`;
                 }
                 landingContact.innerHTML = contactHTML;
                 
