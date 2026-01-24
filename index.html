@@ -336,52 +336,10 @@
         window.services = [];
         window.selectedServices = new Map();
 
-        // Get business ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        window.businessId = urlParams.get('id');
-
-        if (!window.businessId) {
-            showError('Invalid calculator link. Please check your URL.');
-        } else {
-            await loadCalculator();
-        }
-
-        async function loadCalculator() {
-            try {
-                // Load business data
-                const businessDoc = await getDoc(doc(db, 'businesses', window.businessId));
-                if (!businessDoc.exists()) {
-                    showError('Business not found.');
-                    return;
-                }
-
-                window.businessData = businessDoc.data();
-
-                // Apply branding
-                applyBranding();
-
-                // Load services
-                const servicesQuery = query(collection(db, 'services'), where('businessId', '==', window.businessId));
-                const snapshot = await getDocs(servicesQuery);
-                
-                window.services = [];
-                snapshot.forEach((doc) => {
-                    window.services.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (window.services.length === 0) {
-                    showError('No services available at this time.');
-                    return;
-                }
-
-                renderServices();
-                
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-
-            } catch (error) {
-                showError('Error loading calculator: ' + error.message);
-            }
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').classList.remove('hidden');
+            document.getElementById('loadingScreen').classList.add('hidden');
         }
 
         function applyBranding() {
@@ -442,10 +400,52 @@
             });
         }
 
-        function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorMessage').classList.remove('hidden');
-            document.getElementById('loadingScreen').classList.add('hidden');
+        async function loadCalculator() {
+            try {
+                // Load business data
+                const businessDoc = await getDoc(doc(db, 'businesses', window.businessId));
+                if (!businessDoc.exists()) {
+                    showError('Business not found.');
+                    return;
+                }
+
+                window.businessData = businessDoc.data();
+
+                // Apply branding
+                applyBranding();
+
+                // Load services
+                const servicesQuery = query(collection(db, 'services'), where('businessId', '==', window.businessId));
+                const snapshot = await getDocs(servicesQuery);
+                
+                window.services = [];
+                snapshot.forEach((doc) => {
+                    window.services.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (window.services.length === 0) {
+                    showError('No services available at this time.');
+                    return;
+                }
+
+                renderServices();
+                
+                document.getElementById('loadingScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+
+            } catch (error) {
+                showError('Error loading calculator: ' + error.message);
+            }
+        }
+
+        // Get business ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        window.businessId = urlParams.get('id');
+
+        if (!window.businessId) {
+            showError('Invalid calculator link. Please check your URL.');
+        } else {
+            await loadCalculator();
         }
 
         function toggleService(serviceId) {
