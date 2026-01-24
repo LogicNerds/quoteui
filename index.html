@@ -221,6 +221,47 @@
             font-size: 18px;
         }
 
+        /* Landing Section */
+        .landing-section {
+            background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+        }
+
+        .landing-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .landing-headline {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .landing-message {
+            font-size: 18px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+
+        .landing-contact {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            font-size: 16px;
+        }
+
+        .landing-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .error {
             background: #fff3cd;
             border: 2px solid #ffc107;
@@ -248,12 +289,33 @@
                 flex-direction: column;
                 gap: 5px;
             }
+
+            .landing-headline {
+                font-size: 32px;
+            }
+
+            .landing-message {
+                font-size: 16px;
+            }
+
+            .landing-contact {
+                gap: 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div id="loadingScreen" class="loading">
         Loading quote calculator...
+    </div>
+
+    <!-- Landing Page Section -->
+    <div id="landingSection" class="landing-section hidden">
+        <div class="landing-container">
+            <h1 id="landingHeadline" class="landing-headline"></h1>
+            <p id="landingMessage" class="landing-message"></p>
+            <div id="landingContact" class="landing-contact"></div>
+        </div>
     </div>
 
     <div id="mainContent" class="hidden">
@@ -362,6 +424,29 @@
             }
             if (data.secondaryColor) {
                 document.documentElement.style.setProperty('--secondary-color', data.secondaryColor);
+            }
+
+            // Set landing page content
+            const landingHeadline = document.getElementById('landingHeadline');
+            const landingMessage = document.getElementById('landingMessage');
+            const landingContact = document.getElementById('landingContact');
+            const landingSection = document.getElementById('landingSection');
+
+            if (data.landingHeadline || data.landingMessage || data.landingPhone) {
+                landingHeadline.textContent = data.landingHeadline || 'Get Your Custom Quote';
+                landingMessage.textContent = data.landingMessage || '';
+                
+                // Build contact info
+                let contactHTML = '';
+                if (data.contactEmail) {
+                    contactHTML += `<div class="landing-contact-item">📧 ${data.contactEmail}</div>`;
+                }
+                if (data.landingPhone) {
+                    contactHTML += `<div class="landing-contact-item">📞 ${data.landingPhone}</div>`;
+                }
+                landingContact.innerHTML = contactHTML;
+                
+                landingSection.classList.remove('hidden');
             }
         }
 
