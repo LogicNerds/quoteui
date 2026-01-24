@@ -402,14 +402,20 @@
 
         async function loadCalculator() {
             try {
+                console.log('Loading calculator data...');
+                
                 // Load business data
                 const businessDoc = await getDoc(doc(db, 'businesses', window.businessId));
+                console.log('Business doc exists:', businessDoc.exists());
+                
                 if (!businessDoc.exists()) {
+                    console.error('Business not found in database');
                     showError('Business not found.');
                     return;
                 }
 
                 window.businessData = businessDoc.data();
+                console.log('Business data loaded:', window.businessData);
 
                 // Apply branding
                 applyBranding();
@@ -417,23 +423,29 @@
                 // Load services
                 const servicesQuery = query(collection(db, 'services'), where('businessId', '==', window.businessId));
                 const snapshot = await getDocs(servicesQuery);
+                console.log('Services query returned:', snapshot.size, 'documents');
                 
                 window.services = [];
                 snapshot.forEach((doc) => {
                     window.services.push({ id: doc.id, ...doc.data() });
                 });
+                console.log('Services loaded:', window.services);
 
                 if (window.services.length === 0) {
+                    console.warn('No services available');
                     showError('No services available at this time.');
                     return;
                 }
 
                 renderServices();
+                console.log('Services rendered successfully');
                 
                 document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
+                console.log('Calculator loaded successfully');
 
             } catch (error) {
+                console.error('Error loading calculator:', error);
                 showError('Error loading calculator: ' + error.message);
             }
         }
@@ -443,7 +455,10 @@
             const urlParams = new URLSearchParams(window.location.search);
             window.businessId = urlParams.get('id');
 
+            console.log('Initializing calculator with business ID:', window.businessId);
+
             if (!window.businessId) {
+                console.error('No business ID provided in URL');
                 showError('Invalid calculator link. Please check your URL.');
             } else {
                 await loadCalculator();
@@ -451,16 +466,16 @@
         })();
 
         function toggleService(serviceId) {
-            const service = services.find(s => s.id === serviceId);
+            const service = window.services.find(s => s.id === serviceId);
             if (!service || service.priceType === 'perUnit') return;
 
             const card = document.querySelector(`[data-service-id="${serviceId}"]`);
             
-            if (selectedServices.has(serviceId)) {
-                selectedServices.delete(serviceId);
+            if (window.selectedServices.has(serviceId)) {
+                window.selectedServices.delete(serviceId);
                 card.classList.remove('selected');
             } else {
-                selectedServices.set(serviceId, { quantity: 1, service });
+                window.selectedServices.set(serviceId, { quantity: 1, service });
                 card.classList.add('selected');
             }
 
@@ -468,7 +483,7 @@
         }
 
         function changeQuantity(serviceId, delta) {
-            const service = services.find(s => s.id === serviceId);
+            const service = window.services.find(s => s.id === serviceId);
             if (!service) return;
 
             const qtyDisplay = document.getElementById(`qty-${serviceId}`);
@@ -480,10 +495,10 @@
             const card = document.querySelector(`[data-service-id="${serviceId}"]`);
 
             if (newQty > 0) {
-                selectedServices.set(serviceId, { quantity: newQty, service });
+                window.selectedServices.set(serviceId, { quantity: newQty, service });
                 card.classList.add('selected');
             } else {
-                selectedServices.delete(serviceId);
+                window.selectedServices.delete(serviceId);
                 card.classList.remove('selected');
             }
 
@@ -492,7 +507,7 @@
 
         function calculateTotal() {
             let total = 0;
-            selectedServices.forEach(({ quantity, service }) => {
+            window.selectedServices.forEach(({ quantity, service }) => {
                 if (service.priceType === 'perUnit') {
                     total += service.basePrice * quantity;
                 } else {
@@ -506,7 +521,7 @@
             const summaryDiv = document.getElementById('quoteSummary');
             const submitBtn = document.getElementById('submitBtn');
 
-            if (selectedServices.size === 0) {
+            if (window.selectedServices.size === 0) {
                 summaryDiv.innerHTML = '<p style="text-align: center; color: #666;">Select services to see your quote</p>';
                 submitBtn.disabled = true;
                 return;
@@ -514,7 +529,7 @@
 
             let html = '<h3>Selected Services:</h3>';
             
-            selectedServices.forEach(({ quantity, service }) => {
+            window.selectedServices.forEach(({ quantity, service }) => {
                 const lineTotal = service.priceType === 'perUnit' 
                     ? service.basePrice * quantity 
                     : service.basePrice;
@@ -552,7 +567,7 @@
                 return;
             }
 
-            if (!selectedServices.size) {
+            if (!window.selectedServices.size) {
                 alert('Please select at least one service.');
                 return;
             }
@@ -563,7 +578,7 @@
                 customerEmail: email,
                 customerPhone: phone,
                 notes: notes,
-                services: Array.from(selectedServices.values()).map(({ quantity, service }) => ({
+                services: Array.from(window.selectedServices.values()).map(({ quantity, service }) => ({
                     serviceId: service.id,
                     serviceName: service.name,
                     quantity: quantity,
