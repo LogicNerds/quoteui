@@ -662,6 +662,38 @@
 
                 await addDoc(collection(db, 'quotes'), quoteData);
 
+                // Send webhook to n8n for email notifications
+                try {
+                    const webhookData = {
+                        quoteNumber: quoteNumber,
+                        customerName: name,
+                        customerEmail: email || 'Not provided',
+                        customerPhone: phone || 'Not provided',
+                        notes: notes,
+                        businessEmail: window.businessData.contactEmail,
+                        businessName: window.businessData.businessName,
+                        businessPhone: window.businessData.businessPhone || '',
+                        services: Array.from(window.selectedServices.values()).map(({ quantity, service }) => ({
+                            name: service.name,
+                            quantity: quantity,
+                            price: service.basePrice,
+                            priceType: service.priceType,
+                            lineTotal: service.priceType === 'perUnit' ? service.basePrice * quantity : service.basePrice
+                        })),
+                        totalEstimate: calculateTotal(),
+                        timestamp: new Date().toISOString()
+                    };
+
+                    await fetch('YOUR_N8N_WEBHOOK_URL_HERE', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(webhookData)
+                    });
+                } catch (webhookError) {
+                    console.error('Webhook error (non-critical):', webhookError);
+                    // Don't fail the quote submission if webhook fails
+                }
+
                 // Show quote summary with pricing
                 displayQuoteSummary(quoteNumber);
 
