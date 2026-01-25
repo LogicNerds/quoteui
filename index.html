@@ -684,7 +684,7 @@
                         timestamp: new Date().toISOString()
                     };
 
-                    await fetch('YOUR_N8N_WEBHOOK_URL_HERE', {
+                    await fetch('https://elijahchristo.app.n8n.cloud/webhook/quote-nerd-webhook', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(webhookData)
