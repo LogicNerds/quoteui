@@ -499,10 +499,16 @@
                 serviceCard.className = 'service-card';
                 serviceCard.dataset.serviceId = service.id;
 
+                // Build description with unit type if available
+                let description = service.description;
+                if (service.priceType === 'perUnit' && service.unitType) {
+                    description += (description ? ' • ' : '') + service.unitType;
+                }
+
                 serviceCard.innerHTML = `
                     <div>
                         <h3>${service.name}</h3>
-                        <p>${service.description}</p>
+                        <p>${description}</p>
                     </div>
                     ${service.priceType === 'perUnit' ? `
                         <div class="quantity-control">
