@@ -25,7 +25,7 @@
 
         .header {
             background: white;
-            padding: 30px;
+            padding: 20px 30px;
             border-radius: 12px;
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -33,18 +33,20 @@
         }
 
         .logo {
-            max-width: 200px;
-            max-height: 100px;
-            margin-bottom: 20px;
+            max-width: 180px;
+            max-height: 80px;
+            margin-bottom: 12px;
         }
 
         .header h1 {
             color: var(--primary-color, #667eea);
-            margin-bottom: 10px;
+            margin-bottom: 6px;
+            font-size: 24px;
         }
 
         .header p {
             color: #666;
+            font-size: 15px;
         }
 
         .card {
@@ -353,13 +355,19 @@
 
             <!-- Services Selection -->
             <div id="servicesCard" class="card">
-                <h2>Select Services</h2>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <h2 style="margin: 0;">Select Services</h2>
+                    <div id="servicesDisclaimerText" style="font-size: 13px; color: #666; max-width: 350px; text-align: right; display: none;"></div>
+                </div>
+                <p style="margin-bottom: 16px; color: #666; font-size: 14px;">Click a product or service to add it to your quote. Click it again to remove it.</p>
                 <div id="servicesList" class="service-selector"></div>
+                <p style="margin-top: 20px; font-size: 12px; color: #999; line-height: 1.6;">*This quote is an estimate based on the information provided. Actual pricing may vary once the full scope of work is assessed on-site. Final pricing will be confirmed before any work begins.</p>
             </div>
 
             <!-- Quote Summary -->
             <div class="card">
                 <h2>Your Information</h2>
+                <p style="margin-bottom: 16px; color: #666; font-size: 14px;">Please provide us with a few quick details then click "Get Quote"</p>
                 <div class="form-group">
                     <label>Your Name *</label>
                     <input type="text" id="customerName" placeholder="John Doe" required>
@@ -533,6 +541,13 @@
                 // Apply branding
                 applyBranding();
 
+                // Show services disclaimer if it exists
+                if (window.businessData.servicesDisclaimer) {
+                    const disclaimerEl = document.getElementById('servicesDisclaimerText');
+                    disclaimerEl.textContent = window.businessData.servicesDisclaimer;
+                    disclaimerEl.style.display = 'block';
+                }
+
                 // Load services
                 const servicesQuery = query(collection(db, 'services'), where('businessId', '==', window.businessId));
                 const snapshot = await getDocs(servicesQuery);
@@ -684,7 +699,7 @@
                         timestamp: new Date().toISOString()
                     };
 
-                    await fetch('https://elijahchristo.app.n8n.cloud/webhook/send-quote', {
+                    await fetch('https://elijahchristo.app.n8n.cloud/webhook/quote-nerd-webhook', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(webhookData)
