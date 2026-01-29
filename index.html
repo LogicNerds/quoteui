@@ -97,7 +97,7 @@
 
         .service-selector {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -567,6 +567,15 @@
                         window.services.push(serviceData);
                     }
                 });
+                
+                // Sort by order field (or createdAt if no order)
+                window.services.sort((a, b) => {
+                    const orderA = a.order !== undefined ? a.order : 999999;
+                    const orderB = b.order !== undefined ? b.order : 999999;
+                    if (orderA !== orderB) return orderA - orderB;
+                    return new Date(a.createdAt) - new Date(b.createdAt);
+                });
+                
                 console.log('Services loaded:', window.services);
 
                 if (window.services.length === 0) {
@@ -705,7 +714,7 @@
                         timestamp: new Date().toISOString()
                     };
 
-                    await fetch('https://elijahchristo.app.n8n.cloud/webhook/send-quote', {
+                    await fetch('https://elijahchristo.app.n8n.cloud/webhook/quote-nerd-webhook', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(webhookData)
