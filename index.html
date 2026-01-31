@@ -610,6 +610,24 @@
             } else {
                 await loadCalculator();
             }
+
+            // Auto-resize iframe when embedded
+            function postHeight() {
+                const height = document.documentElement.scrollHeight;
+                window.parent.postMessage({ type: 'setHeight', height: height }, '*');
+            }
+
+            // Post height initially and on changes
+            postHeight();
+            
+            // Watch for content changes
+            const resizeObserver = new ResizeObserver(() => {
+                postHeight();
+            });
+            resizeObserver.observe(document.body);
+
+            // Also post on window resize
+            window.addEventListener('resize', postHeight);
         })();
 
         function calculateTotal() {
